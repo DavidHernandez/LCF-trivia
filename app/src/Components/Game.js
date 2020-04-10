@@ -1,4 +1,5 @@
 import React from 'react'
+import Admin from './Admin'
 import Question from './Question'
 import Page from './Page'
 import Players from './Players'
@@ -17,16 +18,18 @@ export default class Game extends React.Component {
             user: null,
         }
 
-        this.nextQuestion = () => {
-            const { trivia } = this.state
-            trivia.nextQuestion()
-            this.setState({ trivia })
-        }
-
         this.loginSuccess = (user) => {
             this.setState({ user })
             this.loadTrivia()
         }
+    }
+
+    componentDidMount() {
+       this.interval = setInterval(() => this.loadTrivia(), 10000);
+    }
+
+    componentWillUnmount() {
+       clearInterval(this.interval);
     }
 
     loadTrivia() {
@@ -47,39 +50,31 @@ export default class Game extends React.Component {
         const { trivia, loaded, user } = this.state
 
         if (user === null) {
-            return (<Page><LoginForm onSuccess={this.loginSuccess} /></Page>)
+            return (<LoginForm onSuccess={this.loginSuccess} />)
         }
 
         if (!loaded) {
             return (<Page><p>Loading...</p></Page>)
         }
 
-        const players = (<Players players={trivia.getPlayers()} />)
-
-        if (trivia.hasEnded()) {
+        if (user.isAdmin) {
+            clearInterval(this.interval);
             return (
-                <Page>
-                    {players}
-                    <h3>El trivial ha terminado</h3>
-                </Page>
+                <Admin trivia={trivia} user={user} />
             )
         }
 
-        if (trivia.hasStarted()) {
-            const question = trivia.getCurrentQuestion()
+        const question = trivia.getCurrentQuestion()
 
-            return (
-                <Page>
-                    {players}
-                    <Question key={"question-" + question.getId()} user={user} question={question} nextQuestion={this.nextQuestion}/>
-                </Page>
-            )
+        let step = 'results'
+        if (question.isActive()) {
+            step = 'game'
         }
 
         return (
             <Page>
-                {players}
-                <input type="button" value="Start" onClick={(e) => this.start()} />
+                <Players players={trivia.getPlayers()} />
+                <Question key={"question-" + question.getId() + step} user={user} question={question} />
             </Page>
         )
     }

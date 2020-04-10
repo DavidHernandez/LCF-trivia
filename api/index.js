@@ -17,10 +17,22 @@ trivia.addQuestion("Apocalipsis por causas sobrenaturales")
 app.use(cors())
 app.use(express.json())
 
+function isAdmin(req) {
+    const json = req.body
+    const { user } = json
+
+    if (!trivia.isAdmin(user.user, user.pass)) {
+        throw new Error('User is not admin')
+    }
+}
+
 function authenticate(req) {
     const json = req.body
     const { user } = json
-    console.log(user)
+    if (trivia.isAdmin(user.user, user.pass)) {
+        return
+    }
+
     if (!trivia.authenticate(user.user, user.pass)) {
         throw new Error('Wrong username or password.')
     }
@@ -28,6 +40,7 @@ function authenticate(req) {
 
 app.get('/api/trivia', (req, res) => res.send(trivia.toJson()))
 
+// Add Answer
 app.post('/api/question/:id', (req, res) => {
     authenticate(req)
 
@@ -37,11 +50,12 @@ app.post('/api/question/:id', (req, res) => {
     const question_id = req.params.id
     const question = trivia.getQuestion(question_id)
 
-    question.addAnswer(user, text)
+    question.addAnswer(user.user, text)
 
     res.json(trivia.toJson())
 })
 
+// Delete answer
 app.delete('/api/question/:id', (req, res) => {
     authenticate(req)
 
@@ -61,11 +75,54 @@ app.post('/api/login', (req, res) => {
     const { user, pass } = json
 
     if (trivia.loginOrRegister(user, pass)) {
-        res.json({ user, pass })
+        let isAdmin = trivia.isAdmin(user, pass)
+        res.json({ user, pass, isAdmin })
     }
     else {
         throw new Error('Wrong username or password.')
     }
+})
+
+// Move to next step of the trivia
+app.post('/api/next', (req, res) => {
+    isAdmin(req)
+
+    const json = req.body
+    const { user } = json
+
+    trivia.nextStep()
+
+    res.json(trivia.toJson())
+})
+
+// Approve an answer
+app.post('/api/question/:id/approve', (req, res) => {
+    isAdmin(req)
+
+    const json = req.body
+    const { answer } = json
+
+    const question_id = req.params.id
+    const question = trivia.getQuestion(question_id)
+
+    question.approveAnswer(answer)
+
+    res.json(trivia.toJson())
+})
+
+// Reject an answer
+app.post('/api/question/:id/reject', (req, res) => {
+    isAdmin(req)
+
+    const json = req.body
+    const { answer } = json
+
+    const question_id = req.params.id
+    const question = trivia.getQuestion(question_id)
+
+    question.rejectAnswer(answer)
+
+    res.json(trivia.toJson())
 })
 
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))

@@ -10,6 +10,18 @@ export default class Api {
             })
     }
 
+    static nextStep(user, success) {
+        fetch('http://localhost:3000/api/next', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ user })
+        })
+        .then(response => Api.validateResponse(response))
+        .then(data => Api.handleCallbacks(data, success))
+    }
+
     static addAnswer(user, questionId, answer, success) {
         fetch('http://localhost:3000/api/question/' + questionId, {
             method: 'POST',
@@ -17,6 +29,30 @@ export default class Api {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ text: answer, user })
+        })
+        .then(response => Api.validateResponse(response))
+        .then(data => Api.handleCallbacks(data, success))
+    }
+
+    static approveAnswer(user, questionId, answer, success) {
+        fetch('http://localhost:3000/api/question/' + questionId + '/approve', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ answer, user })
+        })
+        .then(response => Api.validateResponse(response))
+        .then(data => Api.handleCallbacks(data, success))
+    }
+
+    static rejectAnswer(user, questionId, answer, success) {
+        fetch('http://localhost:3000/api/question/' + questionId + '/reject', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ answer, user })
         })
         .then(response => Api.validateResponse(response))
         .then(data => Api.handleCallbacks(data, success))

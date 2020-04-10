@@ -5,8 +5,6 @@ export default class Trivia {
     constructor() {
         this.questions = []
         this.players = []
-
-        this.currentQuestion = null
     }
 
     addQuestion(question) {
@@ -21,41 +19,26 @@ export default class Trivia {
         return this.players
     }
 
-    start() {
-        this.currentQuestion = 0
-    }
-
-    nextQuestion() {
-        this.currentQuestion++
-    }
-
     getCurrentQuestion() {
-        return this.questions[this.currentQuestion]
-    }
+        for (const question of this.questions) {
+            if (!question.isDone()) {
+                return question
+            }
+        }
 
-    hasStarted() {
-        return this.currentQuestion !== null
-    }
-
-    hasEnded() {
-        return this.currentQuestion >= this.questions.length - 1
+        return null
     }
 
     static fromJson(json) {
         const trivia = new Trivia()
-        trivia.currentQuestion = json.currentQuestion
 
         json.questions.forEach(question => {
             const id = trivia.questions.length
-            const item = new Question(id, question.question)
-
-            question.answers.forEach(answer => item.addAnswer(answer.answer, answer.player))
-
-            trivia.addQuestion(item)
+            trivia.addQuestion(Question.fromJson(id, question))
         })
 
         json.players.forEach(player => {
-            trivia.addPlayer(new Player(player))
+            trivia.addPlayer(Player.fromJson(player))
         })
 
         return trivia

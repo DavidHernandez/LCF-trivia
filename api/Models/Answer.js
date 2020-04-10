@@ -1,7 +1,20 @@
 class Answer {
-    constructor(user, answer) {
-        this.user = user
+    constructor(player, answer) {
+        this.player = player
         this.answer = answer
+        this.isValid = null
+    }
+
+    approve() {
+        this.isValid = true
+    }
+
+    reject() {
+        this.isValid = false
+    }
+
+    isValid() {
+        return this.isValid
     }
 
     getText() {
@@ -15,7 +28,8 @@ class Answer {
     toJson() {
         return {
             answer: this.answer,
-            player: this.user.user,
+            player: this.player,
+            isValid: this.isValid,
         }
     }
 }
