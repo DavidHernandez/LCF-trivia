@@ -1,0 +1,29 @@
+{
+  "name": "lcf-trivia",
+  "version": "1.0.0",
+  "description": "A quick trivia web for the Leyendo Ciencia Ficcion podcast",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "parcel index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DavidHernandez/LCF-trivia.git"
+  },
+  "author": "",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/DavidHernandez/LCF-trivia/issues"
+  },
+  "homepage": "https://github.com/DavidHernandez/LCF-trivia#readme",
+  "dependencies": {
+    "@babel/polyfill": "^7.8.7",
+    "crypto-js": "^4.0.0",
+    "parcel": "^1.12.4",
+    "react-dom": "^16.13.1"
+  },
+  "devDependencies": {
+    "react": "^16.13.1"
+  }
+}
