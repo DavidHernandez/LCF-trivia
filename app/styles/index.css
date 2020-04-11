@@ -1,6 +1,6 @@
 .login-box {
     padding-top: 50px;
-    padding-bottom: 50px;
+    padding-bottom: 70px;
     background-color: #000;
     margin-top: 50px;
 
@@ -43,7 +43,7 @@ header h1 img {
 }
 
 footer {
-    position: absolute;
+    position: fixed;
     bottom: 0;
     width: 100%;
     background: #000;
@@ -62,4 +62,8 @@ footer a {
 
 .login-box .ui.input input::placeholder {
     color: rgba(0,0,0,0.95);
+}
+
+.main-content {
+    padding-bottom: 70px;
 }

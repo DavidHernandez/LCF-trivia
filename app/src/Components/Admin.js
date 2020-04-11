@@ -75,7 +75,7 @@ export default class Admin extends React.Component {
         return (
             <>
                 <Header />
-                <div className="ui two column stackable grid container">
+                <div className="ui two column stackable grid container main-content">
                     <div className="column">
                         <h1>Clasificación</h1>
                         <table className="ui celled table">
