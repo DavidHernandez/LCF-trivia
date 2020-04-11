@@ -34,6 +34,54 @@ export default class Api {
         .then(data => Api.handleCallbacks(data, success))
     }
 
+    static addOtherAnswer(user, questionId, answer, type, success) {
+        fetch('http://localhost:3000/api/question/' + questionId + '/other-answer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ text: answer, user, type })
+        })
+        .then(response => Api.validateResponse(response))
+        .then(data => Api.handleCallbacks(data, success))
+    }
+
+    static approveOtherAnswer(user, questionId, answer, success) {
+        fetch('http://localhost:3000/api/question/' + questionId + '/approve/other-answer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ answer, user })
+        })
+        .then(response => Api.validateResponse(response))
+        .then(data => Api.handleCallbacks(data, success))
+    }
+
+    static rejectOtherAnswer(user, questionId, answer, success) {
+        fetch('http://localhost:3000/api/question/' + questionId + '/reject/other-answer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ answer, user })
+        })
+        .then(response => Api.validateResponse(response))
+        .then(data => Api.handleCallbacks(data, success))
+    }
+
+    static deleteOtherAnswer(user, questionId, answer, success) {
+        fetch('http://localhost:3000/api/question/' + questionId + '/other-answer', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ answer, user })
+        })
+        .then(response => Api.validateResponse(response))
+        .then(data => Api.handleCallbacks(data, success))
+    }
+
     static approveAnswer(user, questionId, answer, success) {
         fetch('http://localhost:3000/api/question/' + questionId + '/approve', {
             method: 'POST',

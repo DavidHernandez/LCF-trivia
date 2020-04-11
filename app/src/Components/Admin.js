@@ -57,6 +57,36 @@ export default class Admin extends React.Component {
         })
     }
 
+    approveOtherAnswer(answer) {
+        const { trivia } = this.state
+        const question = trivia.getCurrentQuestion()
+
+        Api.approveOtherAnswer(this.props.user, question.getId(), answer, () => {
+            answer.approve()
+            this.setState({ trivia })
+        })
+    }
+
+    rejectOtherAnswer(answer) {
+        const { trivia } = this.state
+        const question = trivia.getCurrentQuestion()
+
+        Api.rejectOtherAnswer(this.props.user, question.getId(), answer, () => {
+            answer.reject()
+            this.setState({ trivia })
+        })
+    }
+
+    deleteOtherAnswer(answer) {
+        const { trivia } = this.state
+        const question = trivia.getCurrentQuestion()
+
+        Api.deleteOtherAnswer(this.props.user, question.getId(), answer, () => {
+            question.deleteOtherAnswer(answer)
+            this.setState({ trivia })
+        })
+    }
+
     next() {
         Api.nextStep(this.props.user, (data) => {
             const trivia = Trivia.fromJson(data)
@@ -103,12 +133,15 @@ export default class Admin extends React.Component {
 
     renderActiveQuestion(question) {
         const answers = question.getAnswers().map(answer => this.renderActiveAnswer(answer))
+        const otherAnswers = question.getOtherAnswers().map(answer => this.renderActiveOtherAnswer(answer))
 
         return(
             <>
-                <h2>Current Question: {question.getText()}</h2>
-                <h3>Answers:</h3>
+                <h2>Pregunta actual: {question.getText()}</h2>
+                <h3>Novelas:</h3>
                 <ul>{answers}</ul>
+                <h3>Otras obras:</h3>
+                <ul>{otherAnswers}</ul>
                 <button className="ui lcfcolor right labeled icon button" onClick={(e) => this.next()}>
                     <i class="right arrow icon"></i>
                     Siguiente
@@ -134,12 +167,38 @@ export default class Admin extends React.Component {
         )
     }
 
+    renderActiveOtherAnswer(answer) {
+        return (
+            <li>
+                Respuesta: { answer.getText() } - { answer.getType() }
+                <button className="ui icon blue button" onClick={(e) => this.approveOtherAnswer(answer)}>
+                    <i class="heart icon"></i>
+                </button>
+                <button className="ui icon grey button" onClick={(e) => this.rejectOtherAnswer(answer)}>
+                    <i class="thumbs down icon"></i>
+                </button>
+                <button className="ui icon red button" onClick={(e) => this.deleteOtherAnswer(answer)}>
+                    <i class="trash alternate icon"></i>
+                </button>
+            </li>
+        )
+    }
+
     renderQuestionResults(question) {
         const answers = question.getAnswers()
+        const otherAnswers = question.getOtherAnswers()
+
         const answersOutput = []
         for (const answer of answers) {
             if (answer.isValid) {
                 answersOutput.push(this.renderAnswer(answer))
+            }
+        }
+
+        const otherAnswersOutput = []
+        for (const answer of otherAnswers) {
+            if (answer.isValid) {
+                otherAnswersOutput.push(this.renderOtherAnswer(answer))
             }
         }
 
@@ -151,11 +210,14 @@ export default class Admin extends React.Component {
 
         return(
             <>
-                <h2>Results: {question.getText()}</h2>
-                <h3>Answers:</h3>
+                <h2>Resultados: {question.getText()}</h2>
+                <h3>Novelas:</h3>
                 <ul>{answersOutput}</ul>
 
-                <h3>Points:</h3>
+                <h3>Otras obras:</h3>
+                <ul>{otherAnswersOutput}</ul>
+
+                <h3>Puntos:</h3>
                 <ul>{points}</ul>
 
                 <button className="ui lcfcolor right labeled icon button" onClick={(e) => this.next()}>
@@ -170,6 +232,14 @@ export default class Admin extends React.Component {
         return (
             <li>
                 Respuesta: { answer.getText() } - por { answer.getAuthor() }
+            </li>
+        )
+    }
+
+    renderOtherAnswer(answer) {
+        return (
+            <li>
+                Respuesta: { answer.getText() } - { answer.getType() } - { answer.getAuthor() }
             </li>
         )
     }

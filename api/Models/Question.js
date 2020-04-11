@@ -1,9 +1,11 @@
 const Answer = require('./Answer')
+const OtherAnswer = require('./OtherAnswer')
 
 class Question {
     constructor(question) {
         this.question = question
         this.answers = []
+        this.otherAnswers = []
         this.state = 'active'
         this.points = {}
     }
@@ -55,8 +57,34 @@ class Question {
         this.answers = updatedAnswers
     }
 
+    addOtherAnswer(player, text, type) {
+        const answer = new OtherAnswer(player, text, type)
+        this.otherAnswers.push(answer)
+    }
+
+    approveOtherAnswer(answer) {
+        const { otherAnswers } = this
+        const selectedAnswer = otherAnswers.filter((currentAnswer => currentAnswer.isEquals(answer))).pop()
+
+        selectedAnswer.approve()
+    }
+
+    rejectOtherAnswer(answer) {
+        const { otherAnswers } = this
+        const selectedAnswer = otherAnswers.filter((currentAnswer => currentAnswer.isEquals(answer))).pop()
+
+        selectedAnswer.reject()
+    }
+
+    deleteOtherAnswer(answer) {
+        const { otherAnswers } = this
+        const updatedAnswers = otherAnswers.filter((currentAnswer => !currentAnswer.isEquals(answer)))
+
+        this.otherAnswers = updatedAnswers
+    }
+
     calculatePoints() {
-        const { answers } = this
+        const { answers, otherAnswers } = this
         if (answers == []) {
             return
         }
@@ -71,14 +99,24 @@ class Question {
                 this.points[answer.player] += 3
             }
         })
+        otherAnswers.forEach(answer => {
+            if (answer.isValid) {
+                if (this.points[answer.player] === undefined) {
+                    this.points[answer.player] = 0
+                }
+
+                this.points[answer.player] += 1
+            }
+        })
     }
 
     toJson() {
-        const { question, answers, state, points } = this
+        const { question, answers, otherAnswers, state, points } = this
 
         return {
             question,
             answers: answers.map(answer => answer.toJson()),
+            otherAnswers: otherAnswers.map(answer => answer.toJson()),
             state,
             points,
         }

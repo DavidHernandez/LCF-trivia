@@ -8,6 +8,8 @@ export default class Question extends React.Component {
         this.state = {
             question: props.question,
             answer: '',
+            otherAnswer: '',
+            selection: 'Pelicula',
         }
     }
 
@@ -21,10 +23,28 @@ export default class Question extends React.Component {
         })
     }
 
+    saveOtherAnswer(e) {
+        e.preventDefault()
+        const { question, otherAnswer, selection } = this.state
+
+        Api.addOtherAnswer(this.props.user, question.getId(), otherAnswer, selection, () => {
+            question.addOtherAnswer(otherAnswer, this.props.user.user, selection)
+            this.setState({ question, otherAnswer: '' })
+        })
+    }
+
     deleteAnswer(answer) {
         const { question } = this.state
         Api.deleteAnswer(this.props.user, question.getId(), answer, () => {
             question.deleteAnswer(answer)
+            this.setState({ question })
+        })
+    }
+
+    deleteOtherAnswer(answer) {
+        const { question } = this.state
+        Api.deleteOtherAnswer(this.props.user, question.getId(), answer, () => {
+            question.deleteOtherAnswer(answer)
             this.setState({ question })
         })
     }
@@ -58,17 +78,22 @@ export default class Question extends React.Component {
     }
 
     renderActiveQuestion() {
-        const { question, answer } = this.state
+        const { question, answer, otherAnswer } = this.state
         const answers = question.getAnswers()
+        const otherAnswers = question.getOtherAnswers()
 
         const answerList = answers.map(answer => this.renderAnswer(answer))
+        const otherAnswerList = otherAnswers.map(answer => this.renderOtherAnswer(answer))
 
         return (
             <div className="question" key={"question-" + question.getId()}>
                 <h1>Obras relacionadas con...</h1>
                 <h2>{question.getText()}</h2>
-                <h3>Respuestas:</h3>
+                <h3>Novelas envíadas:</h3>
                 <ul className="ui bulleted list">{ answerList }</ul>
+                <h3>Otras obras envíadas:</h3>
+                <ul className="ui bulleted list">{ otherAnswerList }</ul>
+                <h3>Novelas:</h3>
                 <form className="ui form" onSubmit={(e) => this.saveAnswer(e)}>
                     <div className="field">
                         <input
@@ -84,6 +109,35 @@ export default class Question extends React.Component {
                     </div>
                     <input className="ui fluid large submit lcfcolor button" key="send" type="submit" value="Enviar" />
                 </form>
+                <h3>Otras obras:</h3>
+                <form className="ui form" onSubmit={(e) => this.saveOtherAnswer(e)}>
+                    <div className="field">
+                        <input
+                            key="other-answer"
+                            id="other-answer"
+                            name="other-answer"
+                            type="text"
+                            defaultValue={otherAnswer}
+                            value={otherAnswer}
+                            onChange={(e) => this.setState({otherAnswer: e.target.value})}
+                            placeholder="Envia tu respuesta"
+                        />
+                    </div>
+                    <div className="field">
+                        <select
+                            id="other-answers"
+                            value={otherAnswer}
+                            defaultValue={otherAnswer}
+                            onChange={(e) => this.setState({ selection: e.target.value })}
+                        >
+                            <option value="Pelicula">Pelicula</option>
+                            <option value="Comic">Comic</option>
+                            <option value="Juego">Juego</option>
+                            <option value="Otros">Otros</option>
+                        </select>
+                    </div>
+                    <input className="ui fluid large submit lcfcolor button" key="send" type="submit" value="Enviar" />
+                </form>
             </div>
         )
     }
@@ -95,6 +149,16 @@ export default class Question extends React.Component {
         }
         return (
             <li className="item"><strong>{ answer.getText() }</strong> - { answer.getAuthor() } {deleteLink}</li>
+        )
+    }
+
+    renderOtherAnswer(answer) {
+        let deleteLink = (<></>)
+        if (answer.getAuthor() === this.props.user.user) {
+            deleteLink = (<input className="ui red button" type="button" id="delete" name="delete" value="Delete" onClick={(e) => this.deleteOtherAnswer(answer)} />)
+        }
+        return (
+            <li className="item"><strong>{ answer.getText() } - { answer.getType() }</strong> - { answer.getAuthor() } {deleteLink}</li>
         )
     }
 }

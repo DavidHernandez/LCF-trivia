@@ -55,6 +55,21 @@ app.post('/api/question/:id', (req, res) => {
     res.json(trivia.toJson())
 })
 
+// Add Other Answer
+app.post('/api/question/:id/other-answer', (req, res) => {
+    authenticate(req)
+
+    const json = req.body
+    const { user, text, type } = json
+
+    const question_id = req.params.id
+    const question = trivia.getQuestion(question_id)
+
+    question.addOtherAnswer(user.user, text, type)
+
+    res.json(trivia.toJson())
+})
+
 // Delete answer
 app.delete('/api/question/:id', (req, res) => {
     authenticate(req)
@@ -66,6 +81,21 @@ app.delete('/api/question/:id', (req, res) => {
     const question = trivia.getQuestion(question_id)
 
     question.deleteAnswer(answer)
+
+    res.json(trivia.toJson())
+})
+
+// Delete other answer
+app.delete('/api/question/:id/other-answer', (req, res) => {
+    authenticate(req)
+
+    const json = req.body
+    const { answer } = json
+
+    const question_id = req.params.id
+    const question = trivia.getQuestion(question_id)
+
+    question.deleteOtherAnswer(answer)
 
     res.json(trivia.toJson())
 })
@@ -121,6 +151,36 @@ app.post('/api/question/:id/reject', (req, res) => {
     const question = trivia.getQuestion(question_id)
 
     question.rejectAnswer(answer)
+
+    res.json(trivia.toJson())
+})
+
+// Approve a other answers
+app.post('/api/question/:id/approve/other-answer', (req, res) => {
+    isAdmin(req)
+
+    const json = req.body
+    const { answer } = json
+
+    const question_id = req.params.id
+    const question = trivia.getQuestion(question_id)
+
+    question.approveOtherAnswer(answer)
+
+    res.json(trivia.toJson())
+})
+
+// Reject a other answers
+app.post('/api/question/:id/reject/other-answer', (req, res) => {
+    isAdmin(req)
+
+    const json = req.body
+    const { answer } = json
+
+    const question_id = req.params.id
+    const question = trivia.getQuestion(question_id)
+
+    question.rejectOtherAnswer(answer)
 
     res.json(trivia.toJson())
 })
