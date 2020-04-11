@@ -51,7 +51,7 @@ export default class LoginForm extends React.Component {
                                 <input type="password" id="password" name="password" defaultValue={pass} value={pass} onChange={(e) => this.setState({pass: e.target.value})} placeholder="Password"/>
                             </div>
                         </div>
-                        <input className="ui fluid large submit lcfcolor button" type="submit" value="Login" />
+                        <input className="ui fluid large submit lcfcolor button" type="submit" value="Entrar" />
                     </form>
                 </div>
                 <Footer />
