@@ -125,4 +125,4 @@ app.post('/api/question/:id/reject', (req, res) => {
     res.json(trivia.toJson())
 })
 
-app.listen(port, '51.178.85.126')
+app.listen(port)
