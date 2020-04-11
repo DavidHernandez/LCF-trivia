@@ -8,4 +8,4 @@ COPY package.json package-lock.json /app/
 RUN npm install
 
 COPY . /api
-CMD [ "npm", "run", "start" ]
+CMD [ "npm", "run", "start-dev" ]
